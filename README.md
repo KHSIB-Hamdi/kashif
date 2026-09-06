@@ -1,5 +1,22 @@
 # Fraud Detection — Transaction Compliance Monitoring
 
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.1-092E20?style=flat-square&logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-3.15-A30000?style=flat-square&logo=django&logoColor=white)
+![Channels](https://img.shields.io/badge/Channels-4.1-092E20?style=flat-square&logo=django&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Redux](https://img.shields.io/badge/Redux-5.0-764ABC?style=flat-square&logo=redux&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-5-007FFF?style=flat-square&logo=mui&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-2.2-150458?style=flat-square&logo=pandas&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
+![nginx](https://img.shields.io/badge/nginx-proxy-009639?style=flat-square&logo=nginx&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-embed-F2C811?style=flat-square&logo=powerbi&logoColor=black)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+
 A full-stack system that ingests bank card-transaction exports, scores each transaction with a
 trained Random Forest classifier, flags non-compliant transactions, and streams alerts to a
 live operator dashboard.
@@ -595,3 +612,9 @@ logged, not raised.
 Note that the repository originated as bank-derived internship work. The MIT grant covers the
 source code in this repository; it does not convey any right to the underlying transaction data
 (which is not distributed here) or to Attijari Bank material.
+
+---
+
+<p align="center">
+  Built with ❤️ by <a href="https://github.com/KHSIB-Hamdi"><strong>Hamdi Khsib</strong></a>
+</p>
