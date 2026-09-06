@@ -4,8 +4,8 @@ Date: 2026-09-06
 Scope: full repository — architecture, configuration, dependencies, security, code quality.
 
 Every finding below was verified against the code. Nothing here is inferred from documentation or
-assumed. Paths are relative to the repository root; `app/` is shorthand for the nested
-`Fraud Detection/` application directory.
+assumed. Paths are relative to the repository root; `` is shorthand for the nested
+the repository root application directory.
 
 Each finding is classified:
 
@@ -21,14 +21,14 @@ Each finding is classified:
 
 | Component | Responsibility |
 |---|---|
-| `app/backend/djangoapp/mainapp` | Settings, URL root, ASGI/WSGI entrypoints |
+| `backend/djangoapp/mainapp` | Settings, URL root, ASGI/WSGI entrypoints |
 | `transactions` | `Transaction` model, REST CRUD, filtering, **the ETL + prediction pipeline**, WS consumer |
 | `prediction` | `ModelPerformance` (metrics per transaction), `ModelRating` (operator feedback), WS consumer |
 | `alerts` | `Alert` model, 10-most-recent endpoint, WS consumer |
 | `comments` | Operator comments on the model |
 | `users` | Token auth via `rest_auth`, `UserActivity` audit log, login/logout signals, WS consumer |
-| `app/frontend/react_app` | CRA SPA: Redux store, routed views, four WebSocket subscriptions |
-| `app/nginx` | Reverse proxy (Docker only) |
+| `frontend/react_app` | CRA SPA: Redux store, routed views, four WebSocket subscriptions |
+| `nginx` | Reverse proxy (Docker only) |
 | `fraud-detection.ipynb` | EDA + Random Forest training; produces `random_forest.pkl` |
 
 ### Communication
@@ -51,7 +51,7 @@ Redis (channel layer), PostgreSQL, an SMTP server (Gmail), Power BI Service.
 
 ### 2.1 The repository was not under version control — **RESOLVED FROM CODE**
 
-The only `.git` directory was `app/frontend/react_app/.git`, containing a single commit
+The only `.git` directory was `frontend/react_app/.git`, containing a single commit
 (`Initialize project using Create React App`), no remote, with every subsequent change untracked.
 The backend, Docker, nginx and all configuration had **never** been version-controlled.
 
@@ -62,7 +62,7 @@ nested CRA `.git` removed. Nothing was committed without review.
 ### 2.2 `django-rest-auth` could not run on Django 5.1 — **RESOLVED — FIXED**
 
 `django-rest-auth==0.9.5` (released 2017, unmaintained) is pinned alongside `Django==5.1` and is
-imported at `app/backend/djangoapp/users/views.py:1`.
+imported at `backend/djangoapp/users/views.py:1`.
 
 A clean `pip install -r requirements.txt` followed by `manage.py check` fails:
 
@@ -72,7 +72,7 @@ ImportError: cannot import name 'ugettext_lazy' from 'django.utils.translation'
 
 `ugettext_lazy` was removed in Django 4.0 and `force_text` in Django 4.0 as well.
 
-**Why the app appeared to work:** the bundled `app/localPythonEnv/` contains a **hand-patched**
+**Why the app appeared to work:** the bundled `localPythonEnv/` contains a **hand-patched**
 copy of `rest_auth` — `ugettext_lazy` → `gettext_lazy` in four files, and `force_text` →
 `force_bytes` in `serializers.py`. That patch existed only inside an untracked virtualenv and was
 never recorded anywhere. **Any fresh checkout was unstartable.**
@@ -95,10 +95,10 @@ Four independent breakages:
 
 | File | Problem |
 |---|---|
-| `app/backend/Dockerfile:6,25` | Base image `python:3.7.9-slim-stretch`; Django 5.1 requires Python ≥ 3.10. Also `stretch` is EOL and its apt repos are gone. |
-| `app/frontend/Dockerfile:6,34` | Base image `node:12.18.3-alpine3.9`; react-scripts 5 requires Node ≥ 14. |
-| `app/docker-compose.yml` | No `redis` service, yet `CHANNEL_LAYERS` requires one. No ASGI/Daphne service — the `django` service runs `gunicorn mainapp.wsgi:application`, which cannot serve WebSockets. |
-| `app/nginx/nginx.conf` | No `location /ws` block and no `Upgrade`/`Connection` headers, so WebSocket handshakes are proxied to the React app. |
+| `backend/Dockerfile` | Base image `python:3.7.9-slim-stretch`; Django 5.1 requires Python ≥ 3.10. Also `stretch` is EOL and its apt repos are gone. |
+| `frontend/Dockerfile` | Base image `node:12.18.3-alpine3.9`; react-scripts 5 requires Node ≥ 14. |
+| `docker-compose.yml` | No `redis` service, yet `CHANNEL_LAYERS` requires one. No ASGI/Daphne service — the `django` service runs `gunicorn mainapp.wsgi:application`, which cannot serve WebSockets. |
+| `nginx/nginx.conf` | No `location /ws` block and no `Upgrade`/`Connection` headers, so WebSocket handshakes are proxied to the React app. |
 
 Together these mean **the realtime feature — the core of the product — cannot function in Docker
 at all**, and neither image builds against the pinned dependencies.
@@ -145,7 +145,7 @@ should be refactored to save straight into `models/`.
 
 ### 3.1 Both `requirements.txt` files were UTF-16 — **SAFE TO IMPROVE — FIXED**
 
-`app/requirements.txt` and `app/backend/requirements.txt` were UTF-16LE with BOM. pip mis-parses
+`requirements.txt` and `backend/requirements.txt` were UTF-16LE with BOM. pip mis-parses
 this; the first parsed entry came out as a nonexistent package `3-1==1.0.0`.
 
 **Fixed:** both rewritten as UTF-8/LF. Verified lossless — every original pin preserved (62 → 63
@@ -169,7 +169,7 @@ installed), and `'django_filters'` added to `INSTALLED_APPS`. `manage.py check` 
 
 ### 3.4 The two requirements files diverge — **REQUIRES USER DECISION**
 
-Beyond the fixes above, `app/requirements.txt` still contains ~13 packages absent from the backend
+Beyond the fixes above, `requirements.txt` still contains ~13 packages absent from the backend
 file (`uvicorn`, `watchfiles`, `httptools`, `websockets`, `anyio`, `h11`, `sniffio`, `click`,
 `colorama`, `PyYAML`, `python-dotenv`, plus transitives). The `django-cron` discrepancy is gone —
 it was removed from both files along with the dead `CRON_CLASSES` setting (see 3.7).
@@ -225,12 +225,12 @@ concern credentials present in working-tree files that *would* have been committ
 
 | # | What | Where | Status |
 |---|---|---|---|
-| S1 | Azure AD JWT access token, embedded in frontend source. Payload contained personal data: a full name, a university UPN, and an originating IP address. Expired ~Sept 2024. | `app/frontend/react_app/src/views/analytics/PowerBI.js` | **Removed.** Replaced with `REACT_APP_POWERBI_ACCESS_TOKEN`. Verified absent from source and from a fresh production bundle. |
+| S1 | Azure AD JWT access token, embedded in frontend source. Payload contained personal data: a full name, a university UPN, and an originating IP address. Expired ~Sept 2024. | `frontend/react_app/src/views/analytics/PowerBI.js` | **Removed.** Replaced with `REACT_APP_POWERBI_ACCESS_TOKEN`. Verified absent from source and from a fresh production bundle. |
 | S2 | Power BI report GUID and embed URL hardcoded | same file | **Removed.** Now `REACT_APP_POWERBI_REPORT_ID` / `_EMBED_URL`. |
-| S3 | Gmail App Password in plaintext | `app/backend/djangoapp/mainapp/settings.py` | **Removed.** Now `EMAIL_HOST_PASSWORD` from environment. |
+| S3 | Gmail App Password in plaintext | `backend/djangoapp/mainapp/settings.py` | **Removed.** Now `EMAIL_HOST_PASSWORD` from environment. |
 | S4 | Personal Gmail address as SMTP user | `settings.py` | **Removed.** Now `EMAIL_HOST_USER` from environment. |
 | S5 | Two personal email addresses hardcoded as sender/recipient in a debug endpoint | `users/views.py` `send_test_email` | **Removed.** Now uses `settings.DEFAULT_FROM_EMAIL`. |
-| S6 | Database password, Django admin password, and `SECRET_KEY` | `app/backend/.env`, `app/postgres/.env` | **Left on disk, now git-ignored.** `.env.example` templates added. |
+| S6 | Database password, Django admin password, and `SECRET_KEY` | `backend/.env`, `postgres/.env` | **Left on disk, now git-ignored.** `.env.example` templates added. |
 | S7 | `django-insecure-…` `SECRET_KEY` literal | `settings.py` | **Removed.** Now `os.environ.get('SECRET_KEY', ...)` with a self-describing CHANGE-ME default. `local_settings.py` still overrides it in both real environments. |
 | S9 | Hardcoded local Postgres username and password in the non-Docker branch | `mainapp/local_settings.py` | **Removed.** Now read from `DB_USER`/`DB_PASSWORD`/`DB_DATABASE`/`DB_HOST`/`DB_PORT` with non-secret defaults. |
 | S10 | **Training notebook cell outputs embed real transaction rows** — reference numbers, amounts, product and merchant labels, ~150k-row frames. The same class of data deliberately excluded as `*.xlsx`. | `fraud-detection.ipynb` | **Excluded from Git** pending a decision (see below). Untouched on disk. |
@@ -303,21 +303,19 @@ per request. Flagged as a future improvement, not implemented.
 
 ---
 
-## 6. Structural finding — **REQUIRES USER DECISION**
+## 6. Structural finding — **RESOLVED — FIXED**
 
-The application lives at `Fraud Detection/Fraud Detection/`, i.e. a directory nested inside another
-of the **same name**. The outer level holds the notebook, the data export and the report.
+The application used to live at `Fraud Detection/Fraud Detection/` — a directory nested inside
+another of the **same name**, with the notebook and data at the outer level. Every documented path
+was ambiguous and `cd "Fraud Detection"` had to be typed twice.
 
-This is confusing (`cd "Fraud Detection"` twice) and makes every path in documentation ambiguous.
+**Fixed:** the tree was flattened so `backend/`, `frontend/`, `nginx/`, `postgres/`,
+`docker-compose.yml` and `requirements.txt` now sit at the repository root beside the notebook and
+`docs/`.
 
-**Not changed.** Flattening would move `node_modules/` (1,067 entries) and `localPythonEnv/` (149
-packages), risking a long, interruptible operation on Windows for no functional gain. The Docker
-build contexts are relative and would survive, but the churn is not justified mid-audit.
-
-**Recommendation:** flatten to `app/` (or move the notebook and data into `research/`) as a separate,
-deliberate commit once Git history exists to make it reversible.
-
----
+Verified: Git recorded all 182 tracked files as `R100` renames — byte-identical content, nothing
+lost or modified. Docker build contexts (`./backend`, `./frontend`, `./nginx`) were already
+relative and are unaffected. All documentation paths were updated to match.
 
 ## 7. Deliberately unchanged
 
@@ -328,7 +326,6 @@ To be explicit about scope, the following were **not** touched:
 - The degenerate metric calculation (C2) and the unfinished multi-model feature (C6b).
 - Redux store shape, reducers and action types.
 - Model fields' `SCREAMING_SNAKE_CASE` naming, which maps 1:1 to the source export.
-- Directory layout — the nested `Fraud Detection/Fraud Detection/` remains (section 6).
 - Any external credential. **Nothing was rotated or revoked.**
 
 ## 8. Validation performed
@@ -405,5 +402,4 @@ Ordered by value. Everything the owner authorised in this pass is done; these ar
 8. **Add CI.** Now that both suites pass and exit non-zero on failure, a GitHub Actions workflow
    running `manage.py test` and `npm test` would actually gate merges. Deliberately not added in
    this pass — it was worth having green suites first.
-9. **Flatten the nested directory** (section 6), now that Git history makes it reversible.
-10. **Pin the remaining dependency drift** (3.4) or split into `requirements-dev.txt`.
+9. **Pin the remaining dependency drift** (3.4) or split into `requirements-dev.txt`.

@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Layout
 
-The repo root holds the data-science artifacts; the deployable app lives one level down in `Fraud Detection/`.
+The repo root holds the data-science artifacts; the deployable app lives one level down in the repository root.
 
 - `fraud-detection.ipynb` — exploratory notebook (Kaggle paths) that cleans the raw transaction export, splits `LIB_COMMERÇANT` into `UTILISATION > EMPLACEMENT > TERRITOIRE`, label-encodes + normalizes, and trains the Random Forest that becomes `random_forest.pkl`.
 - `2024-08-12 Extraction_du ... .xlsx` — raw transaction export used as ETL input.
-- `Fraud Detection/` — Django + React + Postgres + nginx application (paths below are relative to this directory).
+- the repository root — Django + React + Postgres + nginx application (paths below are relative to this directory).
 
 ## Commands
 
@@ -30,7 +30,7 @@ python manage.py import_transactions "<path\to\file.xlsx>" # bulk load then batc
 
 Frontend (`frontend/react_app/`): `npm start` (:3000), `npm run build`, `npm test` (CRA/Jest; `npm test -- Transactions` for one file).
 
-Full stack: `docker-compose up --build` from `Fraud Detection/` — nginx on :80 fronts gunicorn (django) and `serve` (react); `backend/entrypoint.sh` waits for postgres, collects static, migrates, and recreates the superuser from `DJANGO_ADMIN_*`.
+Full stack: `docker-compose up --build` from the repository root — nginx on :80 fronts gunicorn (django) and `serve` (react); `backend/entrypoint.sh` waits for postgres, collects static, migrates, and recreates the superuser from `DJANGO_ADMIN_*`.
 
 Redis must be reachable at `127.0.0.1:6379` (`CHANNEL_LAYERS` in `settings.py`) or every broadcast silently fails.
 

@@ -43,7 +43,7 @@ db.sqlite3-journal
 media/
 staticfiles/
 # collectstatic output (STATIC_ROOT = <backend>/djangoapp/static)
-Fraud Detection/backend/djangoapp/static/
+backend/djangoapp/static/
 
 # ---------------------------------------------------------------------------
 # Node / React

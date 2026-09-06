@@ -142,8 +142,8 @@ There is **no** CI pipeline, and no Azure/Terraform/Kubernetes configuration in 
 
 ## Project structure
 
-The application lives one directory below the repository root. The root holds the data-science
-artifacts that produced the model.
+Everything lives at the repository root. The data-science artifacts that produced the model sit
+alongside the application they feed.
 
 ```text
 .
@@ -151,46 +151,46 @@ artifacts that produced the model.
 │                                    (outputs stripped; keep them stripped)
 ├── 2024-08-12 Extraction_*.xlsx     # Raw transaction export (git-ignored, see Configuration)
 ├── Rapport_stage__Attijari_.pdf     # Internship report (git-ignored)
+├── docker-compose.yml               # django + daphne + db + redis + react + nginx
+├── requirements.txt                 # Local/dev Python deps (superset of backend/)
+├── .env.example                     # ENV_API_SERVER (compose build arg)
+├── LICENSE                          # MIT
+├── CLAUDE.md                        # Guidance for AI coding assistants
 ├── docs/
 │   └── AUDIT.md                     # Full repository audit: defects, ambiguities, decisions
-├── CLAUDE.md                        # Guidance for AI coding assistants
-├── LICENSE                          # MIT
-└── Fraud Detection/                 # ── the deployable application ──
-    ├── docker-compose.yml           # django + db + react + nginx
-    ├── requirements.txt             # Local/dev Python deps (superset of backend/)
-    ├── .env.example                 # ENV_API_SERVER (compose build arg)
-    ├── backend/
-    │   ├── Dockerfile
-    │   ├── entrypoint.sh            # waits for PG, collectstatic, migrate, recreate superuser
-    │   ├── requirements.txt         # Deps installed into the Docker image
-    │   ├── .env.example
-    │   └── djangoapp/
-    │       ├── manage.py
-    │       ├── mainapp/             # settings, urls, asgi, wsgi, local_settings
-    │       ├── transactions/        # Transaction model, REST API, ETL commands, WS consumer
-    │       ├── prediction/          # ModelPerformance, ModelRating, WS consumer
-    │       ├── alerts/              # Alert model + WS consumer
-    │       ├── comments/            # Operator comments
-    │       └── users/               # auth, UserActivity audit log, signals
-    ├── frontend/
-    │   ├── Dockerfile
-    │   └── react_app/
-    │       ├── .env.example
-    │       └── src/
-    │           ├── Urls.js             # all routes
-    │           ├── settings.js         # API base URL resolution
-    │           ├── WebSocketContext.js # 4 sockets, mirrored to localStorage
-    │           ├── store/              # one Redux slice per domain
-    │           ├── views/              # pages
-    │           ├── components/dashboard/
-    │           └── Layouts/
-    ├── nginx/nginx.conf
-    ├── postgres/.env.example
-    └── localPythonEnv/              # Legacy virtualenv (git-ignored, do not use — see below)
-
-Also under backend/djangoapp/:
-    mainapp/test_settings.py         # SQLite + in-memory channels, for the test suite
-    models/README.md                 # where random_forest.pkl goes (the .pkl is git-ignored)
+│
+├── backend/
+│   ├── Dockerfile                   # python:3.12-slim-bookworm
+│   ├── entrypoint.sh                # waits for PG, collectstatic, migrate, recreate superuser
+│   ├── requirements.txt             # Deps installed into the Docker image
+│   ├── .env.example
+│   └── djangoapp/
+│       ├── manage.py
+│       ├── mainapp/                 # settings, local_settings, test_settings, urls, asgi, wsgi
+│       ├── models/README.md         # where random_forest.pkl goes (the .pkl is git-ignored)
+│       ├── transactions/            # Transaction model, REST API, ETL commands, WS consumer
+│       ├── prediction/              # ModelPerformance, ModelRating, WS consumer
+│       ├── alerts/                  # Alert model + WS consumer
+│       ├── comments/                # Operator comments
+│       └── users/                   # auth, UserActivity audit log, signals
+│
+├── frontend/
+│   ├── Dockerfile                   # node:20-alpine
+│   └── react_app/
+│       ├── .env.example
+│       └── src/
+│           ├── Urls.js              # all routes
+│           ├── settings.js          # API + WebSocket base URL resolution
+│           ├── settings.test.js
+│           ├── WebSocketContext.js  # 4 sockets, capped + mirrored to localStorage
+│           ├── store/               # one Redux slice per domain
+│           ├── views/               # pages
+│           ├── components/dashboard/
+│           └── Layouts/
+│
+├── nginx/nginx.conf                 # /api + /admin → django, /ws/ → daphne, / → react
+├── postgres/.env.example
+└── localPythonEnv/                  # Legacy virtualenv (git-ignored, do not use — see below)
 ```
 
 ---
@@ -215,14 +215,14 @@ Also under backend/djangoapp/:
 ## Installation
 
 ```bash
-git clone <your-repo-url>
-cd "Fraud Detection"
+git clone https://github.com/KHSIB-Hamdi/fraud-detection.git
+cd fraud-detection
 ```
 
 ### Backend
 
 ```bash
-cd "Fraud Detection"                       # the nested application directory
+# all paths below are relative to the repository root
 
 python -m venv .venv
 # Windows
@@ -241,7 +241,7 @@ clean install now starts as-is.)
 ### Frontend
 
 ```bash
-cd "Fraud Detection/frontend/react_app"
+cd frontend/react_app
 npm install
 ```
 
@@ -252,13 +252,13 @@ npm install
 Copy each `.env.example` to `.env` and fill in real values. **No `.env` file is tracked by Git.**
 
 ```bash
-cp "Fraud Detection/backend/.env.example"              "Fraud Detection/backend/.env"
-cp "Fraud Detection/postgres/.env.example"             "Fraud Detection/postgres/.env"
-cp "Fraud Detection/.env.example"                      "Fraud Detection/.env"
-cp "Fraud Detection/frontend/react_app/.env.example"   "Fraud Detection/frontend/react_app/.env"
+cp backend/.env.example            backend/.env
+cp postgres/.env.example           postgres/.env
+cp .env.example                    .env
+cp frontend/react_app/.env.example frontend/react_app/.env
 ```
 
-### Backend — `Fraud Detection/backend/.env`
+### Backend — `backend/.env`
 
 | Variable | Read at | Required | Purpose |
 |---|---|---|---|
@@ -273,17 +273,17 @@ cp "Fraud Detection/frontend/react_app/.env.example"   "Fraud Detection/frontend
 | `EMAIL_HOST_PASSWORD` | `settings.py:167` | for alerts | Gmail **App Password**, not the account password |
 | `DEFAULT_FROM_EMAIL` | `settings.py:170` | for alerts | alert sender; defaults to `EMAIL_HOST_USER` |
 
-### Database — `Fraud Detection/postgres/.env`
+### Database — `postgres/.env`
 
 `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` — consumed by the `db` service. Must match the
 `DB_*` values above.
 
-### Compose — `Fraud Detection/.env`
+### Compose — `.env`
 
 `ENV_API_SERVER` — passed as the `API_SERVER` build arg to the React image and baked in as
 `REACT_APP_API_SERVER`. This must be the URL the **browser** uses, not an internal container name.
 
-### Frontend — `Fraud Detection/frontend/react_app/.env`
+### Frontend — `frontend/react_app/.env`
 
 | Variable | Read at | Purpose |
 |---|---|---|
@@ -350,7 +350,7 @@ docker compose up -d db
 
 ```bash
 # 3. Django REST API on :8000
-cd "Fraud Detection/backend/djangoapp"
+cd backend/djangoapp
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -358,13 +358,13 @@ python manage.py runserver
 
 ```bash
 # 4. Daphne ASGI server on :8001 — REQUIRED for the live dashboard
-cd "Fraud Detection/backend/djangoapp"
+cd backend/djangoapp
 daphne -p 8001 mainapp.asgi:application
 ```
 
 ```bash
 # 5. React dev server on :3000
-cd "Fraud Detection/frontend/react_app"
+cd frontend/react_app
 npm start
 ```
 
@@ -380,7 +380,7 @@ Port `8001` is not configurable from the frontend — it is hardcoded in
 Two commands exist. They are near-duplicates; prefer the first.
 
 ```bash
-cd "Fraud Detection/backend/djangoapp"
+cd backend/djangoapp
 
 # Streaming: reads one row at a time, predicts, saves, broadcasts, sleeps 0.5s.
 # Best for demoing the live dashboard.
@@ -440,7 +440,7 @@ The backend has a real suite; the frontend has focused unit tests.
 ```bash
 # Backend -- 17 tests. Uses in-memory SQLite and an in-memory channel layer,
 # so it needs neither PostgreSQL nor Redis.
-cd "Fraud Detection/backend/djangoapp"
+cd backend/djangoapp
 python manage.py test --settings=mainapp.test_settings
 
 # A single test class or method:
@@ -450,7 +450,7 @@ python manage.py test users.tests.AuthEndpointTests.test_login_returns_a_token -
 
 ```bash
 # Frontend -- 6 tests
-cd "Fraud Detection/frontend/react_app"
+cd frontend/react_app
 npm test -- --watchAll=false
 
 # One file:
@@ -474,7 +474,7 @@ ESLint rules CRA applies during `npm run build`.
 ## Build
 
 ```bash
-cd "Fraud Detection/frontend/react_app"
+cd frontend/react_app
 npm run build          # → build/, ~484 kB gzipped main bundle
 ```
 
@@ -489,7 +489,6 @@ Docker.
 The only deployment configuration in the repository is Docker Compose:
 
 ```bash
-cd "Fraud Detection"
 docker compose up --build
 ```
 
@@ -513,7 +512,7 @@ recreates** the superuser identified by `DJANGO_ADMIN_EMAIL` on every start.
 
 Both images build against the pinned dependencies (Python 3.12 / Node 20), and the stack now
 includes the `redis` and `daphne` services the realtime feature needs. `ENV_API_SERVER` in
-`Fraud Detection/.env` must be the URL the **browser** uses — it is baked into the JS bundle at
+`.env` must be the URL the **browser** uses — it is baked into the JS bundle at
 build time.
 
 ---
