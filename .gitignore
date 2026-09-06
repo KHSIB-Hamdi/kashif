@@ -1,0 +1,92 @@
+# ---------------------------------------------------------------------------
+# Secrets / environment
+# ---------------------------------------------------------------------------
+.env
+*.env
+**/.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtualenvs (localPythonEnv is a committed venv; recreate it from requirements.txt)
+localPythonEnv/
+venv/
+.venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Machine-learning artifacts
+# random_forest.pkl is produced by fraud-detection.ipynb; see README.
+# ---------------------------------------------------------------------------
+*.pkl
+*.joblib
+
+# ---------------------------------------------------------------------------
+# Django
+# ---------------------------------------------------------------------------
+db.sqlite3
+db.sqlite3-journal
+*.log
+media/
+staticfiles/
+# collectstatic output (STATIC_ROOT = <backend>/djangoapp/static)
+Fraud Detection/backend/djangoapp/static/
+
+# ---------------------------------------------------------------------------
+# Node / React
+# ---------------------------------------------------------------------------
+node_modules/
+/build
+build/
+coverage/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# ---------------------------------------------------------------------------
+# Source data and reports
+# Real bank transaction extracts and the internship report are kept on disk
+# but deliberately excluded from version control. See README > Configuration.
+# ---------------------------------------------------------------------------
+*.xlsx
+*.xls
+*.csv
+Rapport_stage__Attijari_.pdf
+
+# ---------------------------------------------------------------------------
+# Notebooks
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Training notebook: outputs are stripped before committing (they embedded real
+# transaction rows). Keep them stripped -- see docs/AUDIT.md (S10):
+#     pip install nbstripout && nbstripout fraud-detection.ipynb
+# ---------------------------------------------------------------------------

@@ -1,0 +1,29 @@
+.sidebarArea {
+  flex-shrink: 0;
+  width: $sidebarWidth;
+  background-color: $sidebarColor;
+  height: 100vh; // Fix the height of the sidebar to the viewport height
+  position: fixed; // Fix the position of the sidebar
+  top: 0;
+  left: 0;
+  overflow-y: auto; // Allow scrolling inside the sidebar if content overflows
+  z-index: 1000; // Ensure it stays above other content
+  .sidenav-bg:hover {
+    background-color: $gray-100;
+    border-radius: $border-radius;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .sidebarArea {
+    position: fixed;
+    height: 100vh;
+    overflow: auto;
+    z-index: 1;
+    margin-left: -$sidebarWidth;
+    transition: 0.2s ease-in;
+    &.showSidebar {
+      margin-left: 0px;
+    }
+  }
+}

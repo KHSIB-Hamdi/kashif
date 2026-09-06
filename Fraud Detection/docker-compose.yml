@@ -1,0 +1,93 @@
+services:
+  # ---------------------------------------------------------------------
+  # Django REST API (WSGI). Serves /api and /admin.
+  # ---------------------------------------------------------------------
+  django:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - django_static_volume:/usr/src/app/static
+    expose:
+      - 8000
+    env_file:
+      - ./backend/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+
+  # ---------------------------------------------------------------------
+  # Daphne ASGI server. Serves the WebSocket routes in mainapp/asgi.py.
+  # gunicorn/WSGI cannot do this, which is why it needs its own service.
+  # ---------------------------------------------------------------------
+  daphne:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - 8001
+    env_file:
+      - ./backend/.env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: daphne -b 0.0.0.0 -p 8001 mainapp.asgi:application
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./postgres/.env
+
+  # ---------------------------------------------------------------------
+  # Channel layer backing store. Without this every group_send is a no-op
+  # and the live dashboard stays empty.
+  # ---------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - API_SERVER=${ENV_API_SERVER}
+    volumes:
+      - react_static_volume:/usr/src/app/build/static
+    expose:
+      - 3000
+    env_file:
+      - .env
+    command: serve -s build -l 3000
+    depends_on:
+      - django
+
+  nginx:
+    restart: always
+    build: ./nginx
+    volumes:
+      - django_static_volume:/usr/src/app/django_files/static
+      - react_static_volume:/usr/src/app/react_files/static
+    ports:
+      - 80:80
+    depends_on:
+      - react
+      - daphne
+
+volumes:
+  postgres_data:
+  django_static_volume:
+  react_static_volume:
+  redis_data:

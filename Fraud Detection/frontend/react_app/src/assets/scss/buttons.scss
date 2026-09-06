@@ -1,0 +1,14 @@
+.gradient-button {
+    background: linear-gradient(45deg, $purple, $purple-blue); /* Gradient from purple to info blue */
+    border: none; /* Remove border */
+    color: white; /* Text color */
+    padding: 8x 18px; /* Adjust padding */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Adjust font size */
+    cursor: pointer; /* Cursor on hover */
+    transition: background 0.2s ease; /* Smooth transition for hover effect */
+  
+    &:hover {
+      background: linear-gradient(45deg, darken($purple, 7%), darken($purple-blue, 10%)); /* Darker gradient on hover */
+    }
+  }

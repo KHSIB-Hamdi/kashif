@@ -1,0 +1,50 @@
+.pageWrapper {
+  min-height: 100vh;
+}
+.contentArea {
+  flex-grow: 1;
+  margin-left: $sidebarWidth;
+  overflow-y: scroll; // Ensure the main content area is not hidden behind the sidebar
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  &::-webkit-scrollbar {
+    width: 0px;  // Set the width of the scrollbar to 0px
+    background: transparent;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  -ms-overflow-style: none;  // IE and Edge
+  scrollbar-width: none;     // Firefox
+  
+}
+.wrapper {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.card {
+  box-shadow: $card-box-shadow;
+  margin-bottom: 30px;
+}
+
+.circle-box {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 100%;
+  &.lg-box {
+    width: 60px;
+    height: 60px;
+    font-size: 21px;
+    line-height: 60px;
+  }
+}
+.button-group .btn {
+  margin: 3px;
+}
+
+.table>:not(:first-child) {
+  border-top: 2px solid;
+}
+.table-borderless>:not(:first-child) {
+  border-top-width: 0;
+}
