@@ -1,21 +1,32 @@
-# Fraud Detection — Transaction Compliance Monitoring
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="kashif-logo-dark.png">
+    <img src="kashif-logo.png" alt="Kashif — Fraud Intelligence" width="440">
+  </picture>
+</p>
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
-![Django](https://img.shields.io/badge/Django-5.1-092E20?style=flat-square&logo=django&logoColor=white)
-![DRF](https://img.shields.io/badge/DRF-3.15-A30000?style=flat-square&logo=django&logoColor=white)
-![Channels](https://img.shields.io/badge/Channels-4.1-092E20?style=flat-square&logo=django&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)
-![Redux](https://img.shields.io/badge/Redux-5.0-764ABC?style=flat-square&logo=redux&logoColor=white)
-![MUI](https://img.shields.io/badge/MUI-5-007FFF?style=flat-square&logo=mui&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
-![pandas](https://img.shields.io/badge/pandas-2.2-150458?style=flat-square&logo=pandas&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
-![nginx](https://img.shields.io/badge/nginx-proxy-009639?style=flat-square&logo=nginx&logoColor=white)
-![Power BI](https://img.shields.io/badge/Power%20BI-embed-F2C811?style=flat-square&logo=powerbi&logoColor=black)
-![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+<h1 align="center">Kashif</h1>
+
+<p align="center"><em>Transaction fraud intelligence for card payment streams.</em></p>
+
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white">
+  <img alt="Django" src="https://img.shields.io/badge/Django-5.1-092E20?style=flat-square&amp;logo=django&amp;logoColor=white">
+  <img alt="DRF" src="https://img.shields.io/badge/DRF-3.15-A30000?style=flat-square&amp;logo=django&amp;logoColor=white">
+  <img alt="Channels" src="https://img.shields.io/badge/Channels-4.1-092E20?style=flat-square&amp;logo=django&amp;logoColor=white">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-20-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&amp;logo=react&amp;logoColor=black">
+  <img alt="Redux" src="https://img.shields.io/badge/Redux-5.0-764ABC?style=flat-square&amp;logo=redux&amp;logoColor=white">
+  <img alt="MUI" src="https://img.shields.io/badge/MUI-5-007FFF?style=flat-square&amp;logo=mui&amp;logoColor=white">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-12-4169E1?style=flat-square&amp;logo=postgresql&amp;logoColor=white">
+  <img alt="Redis" src="https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&amp;logo=redis&amp;logoColor=white">
+  <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.5-F7931E?style=flat-square&amp;logo=scikitlearn&amp;logoColor=white">
+  <img alt="pandas" src="https://img.shields.io/badge/pandas-2.2-150458?style=flat-square&amp;logo=pandas&amp;logoColor=white">
+  <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&amp;logo=docker&amp;logoColor=white">
+  <img alt="nginx" src="https://img.shields.io/badge/nginx-proxy-009639?style=flat-square&amp;logo=nginx&amp;logoColor=white">
+  <img alt="Power BI" src="https://img.shields.io/badge/Power%20BI-embed-F2C811?style=flat-square&amp;logo=powerbi&amp;logoColor=black">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square">
+</p>
 
 A full-stack system that ingests bank card-transaction exports, scores each transaction with a
 trained Random Forest classifier, flags non-compliant transactions, and streams alerts to a
@@ -168,6 +179,8 @@ alongside the application they feed.
 │                                    (outputs stripped; keep them stripped)
 ├── 2024-08-12 Extraction_*.xlsx     # Raw transaction export (git-ignored, see Configuration)
 ├── Rapport_stage__Attijari_.pdf     # Internship report (git-ignored)
+├── kashif-logo.png                  # wordmark, light theme (used by this README)
+├── kashif-logo-dark.png             # wordmark, dark theme (GitHub picks per theme)
 ├── docker-compose.yml               # django + daphne + db + redis + react + nginx
 ├── requirements.txt                 # Local/dev Python deps (superset of backend/)
 ├── .env.example                     # ENV_API_SERVER (compose build arg)
@@ -232,8 +245,8 @@ alongside the application they feed.
 ## Installation
 
 ```bash
-git clone https://github.com/KHSIB-Hamdi/fraud-detection.git
-cd fraud-detection
+git clone https://github.com/KHSIB-Hamdi/kashif.git
+cd kashif
 ```
 
 ### Backend
